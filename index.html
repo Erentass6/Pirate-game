@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Korsan Savaşları – Yedi Denizin Efendisi</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+<!-- ANİMASYONLU DENİZ CANVAS -->
+<canvas id="sea-canvas"></canvas>
+
+<div id="G">
+
+  <!-- ÜST BAR -->
+  <div id="top">
+    <div id="logo">
+      ⚓ KORSAN SAVAŞLARI
+      <span>Yedi Denizin Efendisi</span>
+    </div>
+    <div id="stats-row">
+      <div class="stat" data-tip="Karakterin seviyesi. XP kazanarak seviye atla, güçlen!">
+        <div class="slbl">⭐ Seviye</div><div class="sval" id="sv-lvl">1</div>
+      </div>
+      <div class="stat" data-tip="Toplam altının. Hazinelerden ve dost NPC'lerden kazanılır.">
+        <div class="slbl">💰 Altın</div><div class="sval" id="sv-gold">0</div>
+      </div>
+      <div class="stat" data-tip="Öldürdüğün toplam düşman sayısı.">
+        <div class="slbl">⚔️ Öldürülen</div><div class="sval" id="sv-kills">0</div>
+      </div>
+      <div class="stat" data-tip="Haritada attığın toplam adım sayısı.">
+        <div class="slbl">👟 Adım</div><div class="sval" id="sv-steps">0</div>
+      </div>
+      <div class="stat" data-tip="Deneyim puanı. Dolunca seviye atlarsın!">
+        <div class="slbl">✨ XP</div>
+        <div class="sval" id="sv-xp">0/50</div>
+        <div id="xp-bar-bg"><div id="xp-bar"></div></div>
+      </div>
+      <div class="top-btns">
+        <button class="icon-btn" id="muzik-btn" title="Müziği aç/kapat">🎵</button>
+        <button class="icon-btn" id="ses-btn"   title="Sesi aç/kapat">🔊</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- GÖVDE -->
+  <div id="body">
+    <!-- SOL -->
+    <div id="left">
+      <div id="map-legend">
+        <span class="leg" data-tip="Sensin! W/A/S/D veya butonlarla hareket et.">🏴‍☠️ Sen</span>
+        <span class="leg" data-tip="Keşfedilmemiş alan — ne var bilinmez, dikkatli ol!">🌊 Sis</span>
+        <span class="leg" data-tip="Düşman! Üstüne basarsan savaş başlar.">⚔️ Düşman</span>
+        <span class="leg" data-tip="Dost NPC — konuşur ve altın verir.">⚓ Dost</span>
+        <span class="leg" data-tip="Hazine! Basınca altın kazanırsın.">💎 Hazine</span>
+        <span class="leg" data-tip="Son patron: Korsan Gemisi. Yenersen oyunu kazanırsın!">🚢 Patron</span>
+      </div>
+      <div id="map-wrap"><div id="map"></div></div>
+      <div id="ctrls">
+        <div class="crow"><button class="cb" id="bu">▲</button></div>
+        <div class="crow">
+          <button class="cb" id="bl">◄</button>
+          <button class="cb" id="bd">▼</button>
+          <button class="cb" id="br">►</button>
+        </div>
+      </div>
+      <div id="hint">W A S D veya ok tuşları · Her 3sn can yenilenir</div>
+      <button id="newbtn">⚓ YENİ SEFER</button>
+    </div>
+
+    <!-- SAĞ -->
+    <div id="right">
+      <div id="char-card">
+        <div class="char-avatar">🏴‍☠️</div>
+        <div class="char-name">Kaptan</div>
+        <div class="char-title">Denizin Korkusu</div>
+        <div class="bar-wrap" data-tip="Canın — sıfırlanırsa oyun biter. Her 3 saniyede otomatik +1 yenilenir!">
+          <div class="bar-lbl"><span>❤️ Can</span><span id="hp-txt">20/20</span></div>
+          <div class="bar-bg"><div class="bar-fill" id="hp-bar"></div></div>
+          <div class="regen-note" id="regen-note">♻ 3sn sonra yenileniyor...</div>
+        </div>
+        <div class="bar-wrap" data-tip="Saldırı gücün — düşmana verilen hasar bu değere göre hesaplanır.">
+          <div class="bar-lbl"><span>⚔️ Güç</span><span id="atk-txt">8</span></div>
+          <div class="bar-bg"><div class="bar-fill" id="atk-bar" style="background:#f0c040"></div></div>
+        </div>
+        <div class="bar-wrap" data-tip="Zırh — düşmanlardan aldığın hasarı bu kadar azaltır.">
+          <div class="bar-lbl"><span>🛡️ Zırh</span><span id="def-txt">3</span></div>
+          <div class="bar-bg"><div class="bar-fill" id="def-bar" style="background:#4488cc"></div></div>
+        </div>
+      </div>
+
+      <div id="npc-card">
+        <div class="npc-hdr" data-tip="Haritada hayatta olan düşmanlar. 🚢 Korsan Gemisi son patrondur!">⚔️ Haritadaki Düşmanlar</div>
+        <div id="npc-list"></div>
+      </div>
+
+      <div class="npc-hdr" style="padding:0 2px 3px;font-size:9px;letter-spacing:2px;color:#7a9ab8;">📜 OLAY GÜNLÜĞÜ</div>
+      <div id="log-box"></div>
+    </div>
+  </div>
+
+  <!-- TOOLTIP -->
+  <div id="tooltip"></div>
+
+  <!-- SAVAŞ EKRANI -->
+  <div id="combat-overlay">
+    <div id="combat-box">
+      <div id="cb-title">⚔ SAVAŞ ⚔</div>
+      <div id="cb-vs">
+        <div class="vs-side">
+          <div class="vs-icon">🏴‍☠️</div>
+          <div class="vs-name">Sen</div>
+          <div class="bar-bg" style="width:80px;margin:4px auto 0"><div class="bar-fill" id="cb-player-bar" style="background:#c03030;width:100%"></div></div>
+          <div class="vs-hp" id="cb-player-hp"></div>
+        </div>
+        <div class="vs-text">VS</div>
+        <div class="vs-side">
+          <div class="vs-icon" id="cb-scene"></div>
+          <div class="vs-name" id="cb-enemy-name"></div>
+          <div class="bar-bg" style="width:80px;margin:4px auto 0"><div class="bar-fill" id="cb-enemy-bar" style="background:#c03030;width:100%"></div></div>
+          <div class="vs-hp" id="cb-hp-lbl"></div>
+        </div>
+      </div>
+      <div id="cb-msg"></div>
+      <div id="cb-btns">
+        <button class="cact" id="act-atk"   title="Normal saldırı — her zaman kullanılabilir">⚔ Saldır</button>
+        <button class="cact" id="act-skill" title="2× hasar ama 3 tur bekleme gerekir">✨ Özel</button>
+        <button class="cact" id="act-flee"  title="%50 ihtimalle kaçış">🌊 Kaç</button>
+      </div>
+      <div id="cd-info"></div>
+    </div>
+  </div>
+
+  <!-- OYUN SONU -->
+  <div id="over-overlay">
+    <div id="over-box">
+      <div id="over-icon"></div>
+      <div id="over-title"></div>
+      <div id="over-msg"></div>
+      <button id="over-btn">⚓ YENİ SEFER</button>
+    </div>
+  </div>
+
+</div>
+<script src="game.js"></script>
+</body>
+</html>
